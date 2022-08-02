@@ -1,0 +1,2 @@
+const val CHUNK_SIZE = 536870912
+const val BUFFER_SIZE = 4096
