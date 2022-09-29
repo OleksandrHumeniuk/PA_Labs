@@ -44,7 +44,6 @@ private fun isSorted(arrA: File, arrB: File, arrC: File): Boolean {
  * Merges elements from inputFiles to outputFiles
  */
 private fun multiwayMerge(inputFiles: Array<File>, outputFiles: Array<File>) {
-
     val bufferedReaders = Array(inputFiles.size) { i -> BufferedReader(FileReader(inputFiles[i])) } // Array with readers of inputFiles
     outputFiles.forEach { it.writeText("")} // Deletes all data from outputFiles before writing to them
 
@@ -111,7 +110,7 @@ private fun isMerged(readers: Array<BufferedReader>): Boolean {
 }
 
 /**
- * Gets the next value (line) from bufferedReader and returns back to its original position
+ * Gets the next value (line) from bufferedReader and returns to its original position
  */
 private fun peek(reader: BufferedReader): String? {
     reader.mark(100)

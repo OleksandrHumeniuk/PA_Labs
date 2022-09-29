@@ -44,7 +44,7 @@ private fun initialSorting(inputFile: File, outputFiles: Array<File>){
 
     var i = 0
     while (true) {
-        val charArr = readChunk(br, (CHUNK_SIZE/2))
+        val charArr = readChunk(br, INITIAL_CHUNK_SIZE)
 
         if (charArr.isEmpty()){
             break
@@ -91,19 +91,23 @@ private fun multiwayMerge(inputFiles: Array<File>, outputFiles: Array<File>) {
     }
 
     var j = 0 // Keeps track in which outputFile to write
-    val set = ArrayList<Int>(0) // Current set of sorted elements
+    var set = ArrayList<Int>(0) // Current set of sorted elements
 
     while (!isMerged(pointerArr)) { //Merges files until they are fully merged
-
         val minIndex = findMin(bufferedArrays, pointerArr, set) //Find minimum among current elements of all inputFiles
 
-        if (minIndex == null || set.size >= chunkSize/4) { // If minimum element wasn't found or current set is
-                                                            //too big - writes set to the according file
+        if (minIndex == null) { // If minimum element wasn't found - writes set to the according file
             writeToFile(bufferedWriters[j], !outputFilesEmpty[j], set.joinToString("\n"))
             outputFilesEmpty[j] = false
             set.clear()
-            if (minIndex == null) j = (j + 1) % outputFiles.size
+            j = (j + 1) % outputFiles.size
+        }
 
+        else if (set.size >= chunkSize/4){ // If set is too big - writes set to the according file, but saves last element
+            val temp = arrayListOf(set.removeLast()) // last element of set
+            writeToFile(bufferedWriters[j], !outputFilesEmpty[j], set.joinToString("\n"))
+            outputFilesEmpty[j] = false
+            set = temp;
         }
 
         if (minIndex != null) { // If minimum element was found - just adds it to the set and increase according pointers
@@ -111,7 +115,7 @@ private fun multiwayMerge(inputFiles: Array<File>, outputFiles: Array<File>) {
             set.add(bufferedArrays[minIndex][pointerArr[minIndex]])
 
             pointerArr[minIndex] ++
-            if (pointerArr[minIndex] >= bufferedArrays[minIndex].size){ // If the end of oen of the arrays is reached
+            if (pointerArr[minIndex] >= bufferedArrays[minIndex].size){ // If the end of the arrays is reached
                                                                         // reads new chunk and resets the pointer
                 val s = peek(bufferedReaders[minIndex])
                 if (s != null) {
